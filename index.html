@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JSON Date</title>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+  <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+
+  <script src="zabuto_calendar.js"></script>
+  <script src="handlebars-v4.0.2.js"></script>
+  <link rel="stylesheet" href="zabuto_calendar.css">
+</head>
+
+<body>
+
+<script type="application/javascript">
+
+  var eventData = [
+    {"date":"2015-09-05","badge":false, "title":"Example 1", body: 'moo', modal: true},
+    {"date":"2015-09-17","badge":true, "title":"Example 2", body: 'moomoo', modal: true}
+  ];
+
+
+  $(document).ready(function () {
+    $("#cal").zabuto_calendar({
+      modal_template: $('#modal-template'),
+      data: eventData
+    });
+  });
+
+
+</script>
+
+<script id="modal-template" type="text/x-handlebars-template">
+<div class="moo">
+  <div>{{date}}</div>
+  <div>{{title}}</div>
+</div>
+</script>
+
+JSON Date calendar
+
+<div id="cal"></div>
+
+</body>
+</html>
