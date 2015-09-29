@@ -13,13 +13,20 @@
 
 <body>
 
+<style type="text/css">
+  .red {
+    background-color: blue !important;
+  }
+</style>
+
 <script type="application/javascript">
 
   var eventData = [
     {"date":"2015-09-05","badge":false, "title":"Example 1", body: 'moo', modal: true},
-    {"date":"2015-09-17","badge":true, "title":"Example 2", body: 'moomoo', modal: true}
+    {"date":"2015-09-17", "badge": { 'content': '3' }, "title":"Example 2", body: 'moomoo', modal: true},
+    {"date":"2015-09-18", "badge": { 'content': 'Day 1', 'class': 'red' }, "title":"Example 3", body: 'Hachoo', modal: false},
+    {"date":"2015-09-20", "badge": true, "title":"Example 2", body: 'moomoo', modal: true}
   ];
-
 
   $(document).ready(function () {
     $("#cal").zabuto_calendar({

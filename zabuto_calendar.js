@@ -438,6 +438,100 @@ $.fn.zabuto_calendar = function (options) {
     }
 
     function drawEvents($calendarElement, type) {
+      var events = $calendarElement.data('events');
+
+      $(events).each(function(index, event){
+        var id = $calendarElement.attr('id') + '_' + event.date;
+        var $dowElement = $('#' + id);
+        var $dayElement = $('#' + id + '_day'); // this holds the number
+
+        $dowElement.data('hasEvent', true);
+
+        addDayEventTitle($dowElement, event.title);
+        addDayEventClassname($dowElement, event.classname);
+        addDayEventBadge($dayElement, event.badge);
+        addDayEventModal($calendarElement, $dowElement, id, event, type);
+      });
+    }
+
+    function addDayEventTitle($dowElement, title) {
+      if (typeof(title) !== 'undefined') {
+        $dowElement.attr('title', title)
+      }
+    }
+
+    function addDayEventClassname($dowElement, classname) {
+      if (typeof(classname) === 'undefined') {
+        $dowElement.addClass('event');
+      } else {
+        $dowElement.addClass('event-styled');
+        $dowElement.addClass(classname);
+      }
+    }
+
+    function addDayEventBadge($dayElement, badgeVar) {
+      var badgeVarType = typeof(badgeVar);
+
+      if (badgeVarType === 'undefined' || badgeVar === false) {
+        return;
+      }
+
+      var badgeClasses = ['badge', 'badge-event'];
+      var customBadgeContent = null;
+
+      if (badgeVarType === 'string') {
+        badgeClasses.push('badge-' + badgeVar);
+
+      } else if (badgeVarType === 'object') {
+        customBadgeContent = badgeVar.content;
+
+        if (badgeVar.class) {
+          badgeClasses.push(badgeVar.class);
+        }
+      }
+
+      var badge = $('<span>', { 'class': badgeClasses.join(' ') });
+
+      if (customBadgeContent) {
+        badge.text(customBadgeContent);
+        $dayElement.prepend(badge);
+      } else {
+        badge.text($dayElement.data('day'));
+        $dayElement.html(badge);
+      }
+    }
+
+    function addDayEventModal($calendarElement, $dowElement, id, event, type) {
+      var ajaxSettings = $calendarElement.data('ajaxSettings');
+
+      if (typeof(event.body) !== 'undefined') {
+
+        var modalUse = false;
+        if (type === 'json' && typeof(event.modal) !== 'undefined' && event.modal === true) {
+          modalUse = true;
+        } else if (type === 'ajax' && 'modal' in ajaxSettings && ajaxSettings.modal === true) {
+          modalUse = true;
+        }
+
+        if (modalUse === true) {
+          $dowElement.addClass('event-clickable');
+
+          var modalTemplate = $calendarElement.data('modalTemplate');
+          if (modalTemplate) {
+            var $modalElement = createTemplateModal(id, modalTemplate, event);
+          } else {
+            var $modalElement = createModal(id, event.title, event.body, event.footer);
+          }
+          $('body').append($modalElement);
+
+          $('#' + id).click(function () {
+            $('#' + id + '_modal').modal();
+          });
+        }
+      }
+    }
+
+    function drawCEvents($calendarElement, type) {
       var jsonData = $calendarElement.data('jsonData');
       var ajaxSettings = $calendarElement.data('ajaxSettings');
 
