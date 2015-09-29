@@ -41,6 +41,8 @@ $.fn.zabuto_calendar = function (options) {
     $calendarElement.data('legendList', opts.legend);
     $calendarElement.data('actionFunction', opts.action);
     $calendarElement.data('actionNavFunction', opts.action_nav);
+
+    $calendarElement.data('dayOfMonthPosition', opts.day_of_month_position);
     //$calendarElement.data('dateClickAjax', opts.date_click_ajax);
 
     if (opts.modal_template) {
@@ -282,14 +284,7 @@ $.fn.zabuto_calendar = function (options) {
             var dateId = $calendarElement.attr('id') + '_' + dateAsString(year, month, currDayOfMonth);
             var dayId = dateId + '_day';
 
-            var $dayElement = $('<div id="' + dayId + '" class="day" >' + currDayOfMonth + '</div>');
-            $dayElement.data('day', currDayOfMonth);
-
-            if ($calendarElement.data('showToday') === true) {
-              if (isToday(year, month, currDayOfMonth)) {
-                $dayElement.html('<span class="badge badge-today">' + currDayOfMonth + '</span>');
-              }
-            }
+            var $dayElement = createDayElement($calendarElement, dayId, currDayOfMonth, month, year);
 
             var $dowElement = $('<td id="' + dateId + '"></td>');
             $dowElement.append($dayElement);
@@ -319,6 +314,39 @@ $.fn.zabuto_calendar = function (options) {
       return $tableObj;
     }
 
+    function createDayElement($calendarElement, dayId, currDayOfMonth, month, year) {
+      var $dayElement = $('<div id="' + dayId + '" class="day" >');// + currDayOfMonth + '</div>');
+      $dayElement.data('day', currDayOfMonth);
+
+      var $dayOfMonthElement = createDayOfMonthElement($calendarElement);
+
+
+      if ($calendarElement.data('showToday') === true && isToday(year, month, currDayOfMonth)) {
+        $dayOfMonthElement.addClass('badge badge-today');
+      }
+
+      $dayOfMonthElement.text(currDayOfMonth);
+      $dayElement.append($dayOfMonthElement);
+
+      return $dayElement;
+    }
+
+    function createDayOfMonthElement($calendarElement) {
+      var dayOfMonthPosition = $calendarElement.data('dayOfMonthPosition');
+      if (typeof(dayOfMonthPosition) === 'undefined') {
+        return $('<span>');
+
+      } else {
+        if (dayOfMonthPosition == 'upper right') {
+          return $('<div class="upper-right">');
+        } else if (dayOfMonthPosition == 'upper left') {
+          return $('<div class="upper-left">');
+        } else {
+          return $('<span>');
+        }
+      }
+    }
+
     /* ----- Modal functions ----- */
 
     function createModalContainer(id, innards) {
@@ -336,7 +364,6 @@ $.fn.zabuto_calendar = function (options) {
 
       return $modalFade;
     }
-
 
     function createTemplateModal(id, template, event) {
       var $modalHeader = $('<div>').append(modalHeaderButton());
@@ -382,12 +409,12 @@ $.fn.zabuto_calendar = function (options) {
       return $modalFooter;
     }
 
-
     function createModal(id, title, body, footer) {
       return createModalContainer(id, basicModal(id, title, body, footer));
     }
 
     /* ----- Event functions ----- */
+
     function checkEvents($calendarElement, year, month) {
       var jsonData = $calendarElement.data('jsonData');
       var ajaxSettings = $calendarElement.data('ajaxSettings');
@@ -449,7 +476,7 @@ $.fn.zabuto_calendar = function (options) {
 
         addDayEventTitle($dowElement, event.title);
         addDayEventClassname($dowElement, event.classname);
-        addDayEventBadge($dayElement, event.badge);
+        addDayEventBadge($calendarElement, $dayElement, event.badge);
         addDayEventModal($calendarElement, $dowElement, id, event, type);
       });
     }
@@ -469,7 +496,7 @@ $.fn.zabuto_calendar = function (options) {
       }
     }
 
-    function addDayEventBadge($dayElement, badgeVar) {
+    function addDayEventBadge($calendarElement, $dayElement, badgeVar) {
       var badgeVarType = typeof(badgeVar);
 
       if (badgeVarType === 'undefined' || badgeVar === false) {
@@ -690,7 +717,8 @@ $.fn.zabuto_calendar_defaults = function () {
   var now = new Date();
   var year = now.getFullYear();
   var month = now.getMonth() + 1;
-  var settings = {
+
+  return {
     language: false,
     year: year,
     month: month,
@@ -707,7 +735,6 @@ $.fn.zabuto_calendar_defaults = function () {
     action: false,
     action_nav: false
   };
-  return settings;
 };
 
 /**
